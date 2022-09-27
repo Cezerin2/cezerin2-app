@@ -2,11 +2,11 @@ import { webhookTypes } from "@shopx/types"
 import { Schema, SchemaDefinition } from "mongoose"
 
 const webhookSchema: SchemaDefinition<webhookTypes> = {
-  description: String,
-  url: String,
-  secret: String,
-  enabled: Boolean,
-  events: [String],
+  name: String,
+  email: String,
+  scopes: [String],
+  is_revoked: Boolean,
+  expiration: Number,
 }
 
 export const webhook = new Schema<webhookTypes>(webhookSchema, {
