@@ -1,8 +1,10 @@
 import Router, { RouterContext } from "@koa/router"
+import axios, { AxiosResponse } from "axios"
 import CezerinClient from "cezerin2-client"
 import handlebars from "handlebars"
 import jwt from "jsonwebtoken"
 import { ObjectID } from "mongodb"
+import { KEY } from "./key"
 import { decodeUserLoginAuth, encodeUserLoginAuth } from "./lib/authHeader"
 import { send } from "./lib/mailer"
 import { db } from "./lib/mongo"
@@ -11,6 +13,7 @@ import { compare, hash } from "./lib/utils"
 import OrderItemsService from "./services/orders/orderItems"
 import EmailTemplatesService from "./services/settings/emailTemplates"
 import SettingsService from "./services/settings/settings"
+import { Order } from "./types"
 
 const ajaxRouter = new Router()
 const TOKEN_PAYLOAD = { email: "store", scopes: ["admin"] }
@@ -639,13 +642,50 @@ ajaxRouter.put("/cart/items/:item_id", async ctx => {
   }
 })
 
+const printifyClient = (
+  operation: string,
+  { items, first_name, last_name, email, shipping_address }: Order
+) =>
+  axios.post<
+    string,
+    AxiosResponse<{
+      data: { shippingCost: { standard: number } }
+      errors: unknown
+    }>
+  >(
+    "http://127.0.0.1:8000/graphql",
+    {
+      query: `
+  mutation {
+    ${operation}(
+      data: {lineItems: [${items.map(
+        ({ quantity, sku }) => `{sku: "${sku}", quantity: ${quantity}}`
+      )}], addressTo: {firstName: "${first_name}", lastName: "${last_name}", email: "${email}", phone: "${
+        shipping_address.phone
+      }", country: "${shipping_address.country}", region: "${
+        shipping_address.city
+      }", address1: "${shipping_address.address1}", address2: "${
+        shipping_address.address2
+      }", city: "${shipping_address.city}", zip: "${
+        shipping_address.postal_code
+      }"}}
+    ) {
+      standard
+    }
+  }
+`,
+    },
+    { headers: { Authorization: KEY, shop_id: 9046797 } }
+  )
+
 ajaxRouter.put("/cart/checkout", async ctx => {
   const orderID = ctx.cookies.get("order_id")
 
   if (orderID) {
     const cartResponse = await api.orders.checkout(orderID)
 
-    const { status, json } = await fillCartItems(cartResponse)
+    const { status, json }: { status: number; json: Order } =
+      await fillCartItems(cartResponse)
 
     let paths = ""
     // generate pdp landing url for the ordered product. More than 1 product in ordered will return comma separated url.
@@ -659,6 +699,10 @@ ajaxRouter.put("/cart/checkout", async ctx => {
       landing_url: paths,
     }
     api.orders.update(orderID, data)
+
+    const printify = await printifyClient("shippingCost", json)
+
+    console.log(printify.data.data.shippingCost.standard)
 
     ctx.cookies.set("order_id")
     ctx.body = json
@@ -681,7 +725,19 @@ ajaxRouter.put("/cart", async ctx => {
 
     const cartResponse = await api.orders.update(orderID, cartData)
 
-    const { status, json } = await fillCartItems(cartResponse)
+    // TODO: shipping cost might be calculated somewhere else, added Printify here temporary to test intergration
+    const { json: data }: { status: number; json: Order } = await fillCartItems(
+      cartResponse
+    )
+
+    const printify = await printifyClient("shippingCost", data)
+
+    console.log(printify.data.data.shippingCost.standard)
+
+    const { status, json }: { status: number; json: Order } =
+      await fillCartItems(cartResponse)
+
+    json.shipping_price = printify.data.data.shippingCost.standard
 
     ctx.body = json
     ctx.status = status
