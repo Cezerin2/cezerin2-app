@@ -1,4 +1,4 @@
-const APPLICATION_DATA_COUNTRIES = {
+export const APPLICATION_DATA_COUNTRIES = {
   AF: "Afghanistan",
   AX: "\u00c5land Islands",
   AL: "Albania",

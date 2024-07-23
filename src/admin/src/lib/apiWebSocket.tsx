@@ -60,23 +60,23 @@ const onClose = event => {
   }
 }
 
-const showNotification = (title, body, requireInteraction = false) => {
+const showNotification = (title, body, requireInteraction = false) => { 
   const msg = new Notification(title, {
     body,
     tag: "dashboard",
     requireInteraction,
   })
 
-  msg.addEventListener("click", event => {
-    parent.focus()
-    event.target.close()
+  msg.addEventListener("click", (evt) => {
+    window.parent.focus()
+    const target = evt.target as EventSource
+    target.close()
   })
 }
 
 const eventHandler = ({ event, payload }) => {
   switch (event) {
     case themeInstalled:
-      const fileName = payload
       store.dispatch(installReceive())
       showNotification(messages.settings_theme, messages.themeInstalled)
       break

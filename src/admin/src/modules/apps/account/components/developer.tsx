@@ -28,7 +28,7 @@ const DeveloperForm = ({ initialValues, onSubmit }) => {
                     component={TextField}
                     fullWidth
                     name="name"
-                    floatingLabelText={messages.full_name}
+                    floatingLabelText={messages.fullName}
                   />
                 </div>
                 <div>
