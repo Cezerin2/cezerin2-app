@@ -100,7 +100,7 @@
     "razzle-plugin-typescript": "^4.2.18",
     "regenerator-runtime": "^0.14.1",
     "typescript": "^5.4.3",
-    "webpack": "^5.91.0",
+    "webpack": "^5.94.0",
     "webpack-cli": "^5.1.4",
     "webpack-dev-server": "^4.15.0",
     "workbox-webpack-plugin": "^7.0.0"
