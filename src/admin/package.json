@@ -33,7 +33,7 @@
     "@sentry/react": "^7.108.0",
     "@sentry/tracing": "^7.108.0",
     "@tinymce/tinymce-react": "^4.3.2",
-    "axios": "^1.6.8",
+    "axios": "^1.7.4",
     "cezerin2-client": "^0.38.0",
     "chart.js": "^2.7.2",
     "final-form": "^4.20.10",
