@@ -1,11 +1,7 @@
-const AjaxCookieBanner {
-  constructor(client) {
-    client = client
-  }
+import AjaxClient from "../ajaxClient"
 
-  retrieve:(data) {
-    => client.post(`/`, data)
-  }
-}
+const AjaxCookieBanner = (client: ReturnType<typeof AjaxClient>) => ({
+  retrieve: data => client.post(`/`, data),
+})
 
 export default AjaxCookieBanner

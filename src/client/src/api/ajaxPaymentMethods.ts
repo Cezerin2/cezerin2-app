@@ -1,11 +1,7 @@
-const AjaxPaymentMethods {
-  constructor(client) {
-    client = client
-  }
+import AjaxClient from "../ajaxClient"
 
-  list:() {
-    => client.get("/payment_methods")
-  }
-}
+const AjaxPaymentMethods = (client: ReturnType<typeof AjaxClient>) => ({
+  list: () => client.get("/payment_methods"),
+})
 
 export default AjaxPaymentMethods

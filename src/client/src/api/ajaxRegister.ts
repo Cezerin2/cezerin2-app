@@ -1,11 +1,7 @@
-const AjaxRegister {
-  constructor(client) {
-    client = client
-  }
+import AjaxClient from "../ajaxClient"
 
-  retrieve:(data) {
-    => client.post(`/register`, data)
-  }
-}
+const AjaxRegister = (client: ReturnType<typeof AjaxClient>) => ({
+  retrieve: data => client.post(`/register`, data),
+})
 
 export default AjaxRegister

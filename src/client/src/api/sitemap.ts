@@ -1,15 +1,14 @@
-const Sitemap {
-  constructor(client) {
-    client = client
-    const resourceUrl =  "/sitemap"
-  }
+import AjaxClient from "../ajaxClient"
+import ApiClient from "../apiClient"
 
-  list:(filter) {
-    => client.get(resourceUrl, filter)
-  }
+export const Sitemap = (
+  client: ReturnType<typeof ApiClient | typeof AjaxClient>
+) => {
+  const resourceUrl = "/sitemap"
 
-  retrieve:(filter) {
-    => client.get(resourceUrl, filter)
+  return {
+    list: filter => client.get(resourceUrl, filter),
+    retrieve: filter => client.get(resourceUrl, filter),
   }
 }
 

@@ -1,11 +1,7 @@
-const AjaxShippingMethods {
-  constructor(client) {
-    client = client
-  }
+import AjaxClient from "../ajaxClient"
 
-  list:() {
-    => client.get("/shipping_methods")
-  }
-}
+const AjaxShippingMethods = (client: ReturnType<typeof AjaxClient>) => ({
+  list: () => client.get("/shipping_methods"),
+})
 
 export default AjaxShippingMethods

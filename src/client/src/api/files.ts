@@ -1,19 +1,12 @@
-const Files {
-  constructor(client) {
-    client = client
-    const resourceUrl =  "/files"
-  }
+import ApiClient from "../apiClient"
 
-  list:(filter) {
-    => client.get(resourceUrl, filter)
-  }
+export const Files = (client: ReturnType<typeof ApiClient>) => {
+  const resourceUrl = "/files"
 
-  upload:(formData) {
-    => client.postFormData(resourceUrl, formData)
-  }
-
-  delete:(fileName) {
-    => client.delete(`${resourceUrl}/${fileName}`)
+  return {
+    list: filter => client.get(resourceUrl, filter),
+    upload: formData => client.postFormData(resourceUrl, formData),
+    delete: fileName => client.delete(`${resourceUrl}/${fileName}`),
   }
 }
 

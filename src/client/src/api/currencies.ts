@@ -1,11 +1,10 @@
-const Currencies {
-  constructor(client) {
-    client = client
-  }
+import AjaxClient from "../ajaxClient"
+import ApiClient from "../apiClient"
 
-  list:() {
-    => client.get("/currencies")
-  }
-}
+export const Currencies = (
+  client: ReturnType<typeof ApiClient | typeof AjaxClient>
+) => ({
+  list: () => client.get("/currencies"),
+})
 
 export default Currencies

@@ -1,15 +1,12 @@
-const AppSettings {
-  constructor(client) {
-    client = client
-    const resourceUrl =  "/apps"
-  }
+import ApiClient from "../../apiClient"
 
-  retrieve:(appKey) {
-    => client.get(`${resourceUrl}/${appKey}/settings`)
-  }
+export const AppSettings = (client: ReturnType<typeof ApiClient>) => {
+  const resourceUrl = "/apps"
 
-  update:(appKey, data) {
-    => client.put(`${resourceUrl}/${appKey}/settings`, data)
+  return {
+    retrieve: appKey => client.get(`${resourceUrl}/${appKey}/settings`),
+    update: (appKey, data) =>
+      client.put(`${resourceUrl}/${appKey}/settings`, data),
   }
 }
 

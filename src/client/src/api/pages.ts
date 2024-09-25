@@ -1,27 +1,17 @@
-const Pages {
-  constructor(client) {
-    client = client
-    const resourceUrl =  "/pages"
-  }
+import AjaxClient from "../ajaxClient"
+import ApiClient from "../apiClient"
 
-  list:(filter) {
-    => client.get(resourceUrl, filter)
-  }
+export const Pages = (
+  client: ReturnType<typeof ApiClient | typeof AjaxClient>
+) => {
+  const resourceUrl = "/pages"
 
-  retrieve:(id) {
-    => client.get(`${resourceUrl}/${id}`)
-  }
-
-  create:(data) {
-    => client.post(resourceUrl, data)
-  }
-
-  update:(id, data) {
-    => client.put(`${resourceUrl}/${id}`, data)
-  }
-
-  delete:(id) {
-    => client.delete(`${resourceUrl}/${id}`)
+  return {
+    list: filter => client.get(resourceUrl, filter),
+    retrieve: id => client.get(`${resourceUrl}/${id}`),
+    create: data => client.post(resourceUrl, data),
+    update: (id, data) => client.put(`${resourceUrl}/${id}`, data),
+    delete: id => client.delete(`${resourceUrl}/${id}`),
   }
 }
 

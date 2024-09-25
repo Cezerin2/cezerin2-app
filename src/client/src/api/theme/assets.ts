@@ -1,15 +1,11 @@
-const ThemeAssets {
-  constructor(client) {
-    client = client
-    const resourceUrl =  "/theme/assets"
-  }
+import ApiClient from "../../apiClient"
 
-  uploadFile:(formData) {
-    => client.postFormData(resourceUrl, formData)
-  }
+export const ThemeAssets = (client: ReturnType<typeof ApiClient>) => {
+  const resourceUrl = "/theme/assets"
 
-  deleteFile:(fileName) {
-    => client.delete(`${resourceUrl}/${fileName}`)
+  return {
+    uploadFile: formData => client.postFormData(resourceUrl, formData),
+    deleteFile: fileName => client.delete(`${resourceUrl}/${fileName}`),
   }
 }
 

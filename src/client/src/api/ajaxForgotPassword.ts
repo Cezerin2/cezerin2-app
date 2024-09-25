@@ -1,15 +1,8 @@
-const AjaxForgotPassword {
-  constructor(client) {
-    client = client
-  }
+import AjaxClient from "../ajaxClient"
 
-  retrieve:(data) {
-    => client.post(`/forgot-password`, data)
-  }
-
-  update:(data) {
-    => client.put(`/forgot-password`, data)
-  }
-}
+const AjaxForgotPassword = (client: ReturnType<typeof AjaxClient>) => ({
+  retrieve: data => client.post(`/forgot-password`, data),
+  update: data => client.put(`/forgot-password`, data),
+})
 
 export default AjaxForgotPassword

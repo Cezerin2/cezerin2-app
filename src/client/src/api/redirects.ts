@@ -1,27 +1,14 @@
-const Redirects {
-  constructor(client) {
-    client = client
-    const resourceUrl =  "/redirects"
-  }
+import ApiClient from "../apiClient"
 
-  list:() {
-    => client.get(resourceUrl)
-  }
+export const Redirects = (client: ReturnType<typeof ApiClient>) => {
+  const resourceUrl = "/redirects"
 
-  retrieve:(id) {
-    => client.get(`${resourceUrl}/${id}`)
-  }
-
-  create:(data) {
-    => client.post(resourceUrl, data)
-  }
-
-  update:(id, data) {
-    => client.put(`${resourceUrl}/${id}`, data)
-  }
-
-  delete:(id) {
-    => client.delete(`${resourceUrl}/${id}`)
+  return {
+    list: () => client.get(resourceUrl),
+    retrieve: id => client.get(`${resourceUrl}/${id}`),
+    create: data => client.post(resourceUrl, data),
+    update: (id, data) => client.put(`${resourceUrl}/${id}`, data),
+    delete: id => client.delete(`${resourceUrl}/${id}`),
   }
 }
 

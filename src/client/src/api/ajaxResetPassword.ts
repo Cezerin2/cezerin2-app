@@ -1,15 +1,8 @@
-const AjaxResetPassword {
-  constructor(client) {
-    client = client
-  }
+import AjaxClient from "../ajaxClient"
 
-  retrieve:(data) {
-    => client.post(`/reset-password`, data)
-  }
-
-  update:(data) {
-    => client.put(`/reset-password`, data)
-  }
-}
+const AjaxResetPassword = (client: ReturnType<typeof AjaxClient>) => ({
+  retrieve: data => client.post(`/reset-password`, data),
+  update: data => client.put(`/reset-password`, data),
+})
 
 export default AjaxResetPassword

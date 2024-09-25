@@ -1,11 +1,7 @@
-const Text {
-  constructor(client) {
-    client = client
-  }
+import ApiClient from "../apiClient"
 
-  list:() {
-    => client.get("/text")
-  }
-}
+export const Text = (client: ReturnType<typeof ApiClient>) => ({
+  list: () => client.get("/text"),
+})
 
 export default Text

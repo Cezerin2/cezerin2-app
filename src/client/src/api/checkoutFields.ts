@@ -1,19 +1,12 @@
-const CheckoutFields {
-  constructor(client) {
-    client = client
-    const resourceUrl =  "/settings/checkout/fields"
-  }
+import ApiClient from "../apiClient"
 
-  list:() {
-    => client.get(resourceUrl)
-  }
+export const CheckoutFields = (client: ReturnType<typeof ApiClient>) => {
+  const resourceUrl = "/settings/checkout/fields"
 
-  retrieve:(name) {
-    => client.get(`${resourceUrl}/${name}`)
-  }
-
-  update:(name, data) {
-    => client.put(`${resourceUrl}/${name}`, data)
+  return {
+    list: () => client.get(resourceUrl),
+    retrieve: name => client.get(`${resourceUrl}/${name}`),
+    update: (name, data) => client.put(`${resourceUrl}/${name}`, data),
   }
 }
 

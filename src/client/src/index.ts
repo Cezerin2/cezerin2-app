@@ -31,11 +31,13 @@ import Text from "./api/text"
 import Theme from "./api/theme/theme"
 import Tokens from "./api/tokens"
 import Webhooks from "./api/webhooks"
-import ApiClient from "./apiClient"
+import ApiClient, { authorize as apiClientAuthorize } from "./apiClient"
 import { Options } from "./types"
 import WebStoreAccount from "./webstore/account"
 import WebStoreServices from "./webstore/services"
-import WebStoreClient from "./webstoreClient"
+import WebStoreClient, {
+  authorize as webStoreClientAuthorize,
+} from "./webstoreClient"
 
 export const Client = (options: Options) => {
   const {
@@ -45,12 +47,8 @@ export const Client = (options: Options) => {
     webstoreToken,
   } = options
 
-  const apiClient = ApiClient({
-    baseUrl: apiBaseUrl,
-    token: apiToken,
-  })
-
-  const ajaxClient = AjaxClient({ baseUrl: ajaxBaseUrl })
+  const apiClient = ApiClient(apiBaseUrl, apiToken)
+  const ajaxClient = AjaxClient(ajaxBaseUrl)
   const webstoreClient = WebStoreClient({ token: webstoreToken })
 
   return {
@@ -102,7 +100,7 @@ export const Client = (options: Options) => {
   }
 }
 
-export const { authorize } = ApiClient
-export const authorizeInWebStore = WebStoreClient.authorize
+export const authorize = apiClientAuthorize
+export const authorizeInWebStore = webStoreClientAuthorize
 
 export default Client

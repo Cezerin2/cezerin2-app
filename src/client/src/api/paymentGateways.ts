@@ -1,15 +1,12 @@
-const PaymentGateways {
-  constructor(client) {
-    client = client
-    const resourceUrl =  "/payment_gateways"
-  }
+import ApiClient from "../apiClient"
 
-  retrieve:(gatewayName) {
-    => client.get(`${resourceUrl}/${gatewayName}`)
-  }
+export const PaymentGateways = (client: ReturnType<typeof ApiClient>) => {
+  const resourceUrl = "/payment_gateways"
 
-  update:(gatewayName, data) {
-    => client.put(`${resourceUrl}/${gatewayName}`, data)
+  return {
+    retrieve: gatewayName => client.get(`${resourceUrl}/${gatewayName}`),
+    update: (gatewayName, data) =>
+      client.put(`${resourceUrl}/${gatewayName}`, data),
   }
 }
 

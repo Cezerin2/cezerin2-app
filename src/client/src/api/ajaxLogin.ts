@@ -1,11 +1,7 @@
-const AjaxLogin {
-  constructor(client) {
-    client = client
-  }
+import AjaxClient from "../ajaxClient"
 
-  retrieve:(data) {
-    => client.post(`/login`, data)
-  }
-}
+const AjaxLogin = (client: ReturnType<typeof AjaxClient>) => ({
+  retrieve: data => client.post(`/login`, data),
+})
 
 export default AjaxLogin

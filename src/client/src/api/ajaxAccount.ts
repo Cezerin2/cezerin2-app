@@ -1,15 +1,8 @@
-const AjaxAccount {
-  constructor(client) {
-    client = client
-  }
+import AjaxClient from "../ajaxClient"
 
-  retrieve:(data) {
-    => client.post(`/customer-account`, data)
-  }
-
-  update:(data) {
-    => client.put(`/customer-account`, data)
-  }
-}
+const AjaxAccount = (client: ReturnType<typeof AjaxClient>) => ({
+  retrieve: data => client.post(`/customer-account`, data),
+  update: data => client.put(`/customer-account`, data),
+})
 
 export default AjaxAccount
