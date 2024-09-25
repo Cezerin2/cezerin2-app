@@ -52,7 +52,7 @@ const EditPaymentMethodForm: FC<Props> = props => {
 
   useEffect(() => {
     setGateway(initialValues.gateway)
-  }, [initialValues.gateway])
+  }, [initialValues])
 
   const isAdd = methodId === null || methodId === undefined
   let paymentGateways = []
