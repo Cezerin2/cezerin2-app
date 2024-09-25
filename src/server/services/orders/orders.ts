@@ -1,6 +1,7 @@
 import handlebars from "handlebars"
 import { escapeRegExp } from "lodash"
 import { ObjectID } from "mongodb"
+import { printifyClient } from "../../ajaxRouter"
 import dashboardWebSocket from "../../lib/dashboardWebSocket"
 import { send } from "../../lib/mailer"
 import { db } from "../../lib/mongo"
@@ -532,107 +533,115 @@ class OrdersService {
   }
 
   changeProperties(order, orderStatuses, shippingMethods, paymentMethods) {
-    if (order) {
-      order.id = order._id.toString()
-      delete order._id
+    return new Promise((resolve, reject) => {
+      if (order) {
+        order.id = order._id.toString()
+        delete order._id
 
-      const orderStatus =
-        order.status_id && orderStatuses.length > 0
-          ? orderStatuses.find(
-              i => i.id.toString() === order.status_id.toString()
-            )
-          : null
-      const orderShippingMethod =
-        order.shipping_method_id && shippingMethods.length > 0
-          ? shippingMethods.find(
-              i => i.id.toString() === order.shipping_method_id.toString()
-            )
-          : null
-      const orderPaymentMethod =
-        order.payment_method_id && paymentMethods.length > 0
-          ? paymentMethods.find(
-              i => i.id.toString() === order.payment_method_id.toString()
-            )
-          : null
+        const orderStatus =
+          order.status_id && orderStatuses.length > 0
+            ? orderStatuses.find(
+                i => i.id.toString() === order.status_id.toString()
+              )
+            : null
+        const orderShippingMethod =
+          order.shipping_method_id && shippingMethods.length > 0
+            ? shippingMethods.find(
+                i => i.id.toString() === order.shipping_method_id.toString()
+              )
+            : null
+        const orderPaymentMethod =
+          order.payment_method_id && paymentMethods.length > 0
+            ? paymentMethods.find(
+                i => i.id.toString() === order.payment_method_id.toString()
+              )
+            : null
 
-      order.status = orderStatus ? orderStatus.name : ""
-      order.shipping_method = orderShippingMethod
-        ? orderShippingMethod.name
-        : ""
-      order.payment_method = orderPaymentMethod ? orderPaymentMethod.name : ""
-      order.payment_method_gateway = orderPaymentMethod
-        ? orderPaymentMethod.gateway
-        : ""
+        order.status = orderStatus ? orderStatus.name : ""
+        order.shipping_method = orderShippingMethod
+          ? orderShippingMethod.name
+          : ""
+        order.payment_method = orderPaymentMethod ? orderPaymentMethod.name : ""
+        order.payment_method_gateway = orderPaymentMethod
+          ? orderPaymentMethod.gateway
+          : ""
 
-      let sum_items_weight = 0
-      let sum_items_price_total = 0
-      let sum_items_discount_total = 0
-      let sum_discounts_amount = 0
-      let sum_items_tax_total = 0
+        let sum_items_weight = 0
+        let sum_items_price_total = 0
+        let sum_items_discount_total = 0
+        let sum_discounts_amount = 0
+        let sum_items_tax_total = 0
 
-      if (order.items && order.items.length > 0) {
-        order.items.forEach(item => {
-          const item_weight = item.weight * item.quantity
-          if (item_weight > 0) {
-            sum_items_weight += item_weight
-          }
-        })
-
-        order.items.forEach(item => {
-          if (item.price_total > 0) {
-            sum_items_price_total += item.price_total
-          }
-        })
-
-        order.items.forEach(item => {
-          if (item.price_total > 0 && order.tax_rate > 0) {
-            if (order.item_tax_included) {
-              sum_items_tax_total +=
-                item.price_total - item.price_total / (1 + order.tax_rate / 100)
-            } else {
-              sum_items_tax_total += item.price_total * (order.tax_rate / 100)
+        if (order.items && order.items.length > 0) {
+          order.items.forEach(item => {
+            const item_weight = item.weight * item.quantity
+            if (item_weight > 0) {
+              sum_items_weight += item_weight
             }
-          }
-        })
+          })
 
-        order.items.forEach(item => {
-          if (item.discount_total > 0) {
-            sum_items_discount_total += item.discount_total
-          }
+          order.items.forEach(item => {
+            if (item.price_total > 0) {
+              sum_items_price_total += item.price_total
+            }
+          })
+
+          order.items.forEach(item => {
+            if (item.price_total > 0 && order.tax_rate > 0) {
+              if (order.item_tax_included) {
+                sum_items_tax_total +=
+                  item.price_total -
+                  item.price_total / (1 + order.tax_rate / 100)
+              } else {
+                sum_items_tax_total += item.price_total * (order.tax_rate / 100)
+              }
+            }
+          })
+
+          order.items.forEach(item => {
+            if (item.discount_total > 0) {
+              sum_items_discount_total += item.discount_total
+            }
+          })
+        }
+
+        const tax_included_total =
+          (order.item_tax_included ? 0 : sum_items_tax_total) +
+          (order.shipping_tax_included ? 0 : order.shipping_tax)
+
+        if (order.discounts && order.discounts.length > 0) {
+          order.items.forEach(item => {
+            if (item.amount > 0) {
+              sum_discounts_amount += item.amount
+            }
+          })
+        }
+
+        printifyClient("shippingCost", order).then(({ data }) => {
+          const tax_total = sum_items_tax_total + order.shipping_tax
+          const shipping_total =
+            order.shipping_price -
+            order.shipping_discount +
+            data?.data?.shippingCost?.standard
+          const discount_total = sum_items_discount_total + sum_discounts_amount
+          const grand_total =
+            sum_items_price_total +
+            shipping_total +
+            tax_included_total -
+            discount_total
+
+          order.weight_total = sum_items_weight
+          order.discount_total = discount_total // sum(items.discount_total)+sum(discounts.amount)
+          order.subtotal = sum_items_price_total // sum(items.price_total)
+          order.tax_included_total = tax_included_total // if(item_tax_included, 0, item_tax) + if(shipment_tax_included, 0, shipping_tax)
+          order.tax_total = tax_total // item_tax + shipping_tax
+          order.shipping_total = shipping_total // shipping_price-shipping_discount
+          order.grand_total = grand_total // subtotal + shipping_total + tax_included_total - (discount_total)
+
+          return resolve(order)
         })
       }
-
-      const tax_included_total =
-        (order.item_tax_included ? 0 : sum_items_tax_total) +
-        (order.shipping_tax_included ? 0 : order.shipping_tax)
-
-      if (order.discounts && order.discounts.length > 0) {
-        order.items.forEach(item => {
-          if (item.amount > 0) {
-            sum_discounts_amount += item.amount
-          }
-        })
-      }
-
-      const tax_total = sum_items_tax_total + order.shipping_tax
-      const shipping_total = order.shipping_price - order.shipping_discount
-      const discount_total = sum_items_discount_total + sum_discounts_amount
-      const grand_total =
-        sum_items_price_total +
-        shipping_total +
-        tax_included_total -
-        discount_total
-
-      order.weight_total = sum_items_weight
-      order.discount_total = discount_total // sum(items.discount_total)+sum(discounts.amount)
-      order.subtotal = sum_items_price_total // sum(items.price_total)
-      order.tax_included_total = tax_included_total // if(item_tax_included, 0, item_tax) + if(shipment_tax_included, 0, shipping_tax)
-      order.tax_total = tax_total // item_tax + shipping_tax
-      order.shipping_total = shipping_total // shipping_price-shipping_discount
-      order.grand_total = grand_total // subtotal + shipping_total + tax_included_total - (discount_total)
-    }
-
-    return order
+    })
   }
 
   getEmailSubject(emailTemplate, order) {

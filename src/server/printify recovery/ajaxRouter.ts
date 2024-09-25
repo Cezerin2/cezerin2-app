@@ -1,10 +1,8 @@
 import Router, { RouterContext } from "@koa/router"
-import axios, { AxiosResponse } from "axios"
 import CezerinClient from "cezerin2-client"
 import handlebars from "handlebars"
 import jwt from "jsonwebtoken"
 import { ObjectID } from "mongodb"
-import { KEY } from "./key"
 import { decodeUserLoginAuth, encodeUserLoginAuth } from "./lib/authHeader"
 import { send } from "./lib/mailer"
 import { db } from "./lib/mongo"
@@ -13,7 +11,6 @@ import { compare, hash } from "./lib/utils"
 import OrderItemsService from "./services/orders/orderItems"
 import EmailTemplatesService from "./services/settings/emailTemplates"
 import SettingsService from "./services/settings/settings"
-import { Order } from "./types"
 
 const ajaxRouter = new Router()
 const TOKEN_PAYLOAD = { email: "store", scopes: ["admin"] }
@@ -126,10 +123,7 @@ ajaxRouter.get("/cart", async ctx => {
 
     const printify = await printifyClient("shippingCost", json)
 
-    console.log(
-      printify.data.data.shippingCost.standard,
-      "shippingCost.standard"
-    )
+    console.log(printify.data.data.shippingCost.standard, "dasfasfs")
     // json.shipping_price = printify.data.data.shippingCost.standard
     // json.shipping_total = printify.data.data.shippingCost.standard
 
@@ -652,6 +646,8 @@ ajaxRouter.put("/cart/items/:item_id", async ctx => {
   }
 })
 
+<<<<<<< Updated upstream
+=======
 export const printifyClient = (
   operation: string,
   { items, first_name, last_name, email, shipping_address }: Order
@@ -688,14 +684,14 @@ export const printifyClient = (
     { headers: { Authorization: KEY, shop_id: 9046797 } }
   )
 
+>>>>>>> Stashed changes
 ajaxRouter.put("/cart/checkout", async ctx => {
   const orderID = ctx.cookies.get("order_id")
 
   if (orderID) {
     const cartResponse = await api.orders.checkout(orderID)
 
-    const { status, json }: { status: number; json: Order } =
-      await fillCartItems(cartResponse)
+    const { status, json } = await fillCartItems(cartResponse)
 
     let paths = ""
     // generate pdp landing url for the ordered product. More than 1 product in ordered will return comma separated url.
@@ -709,10 +705,6 @@ ajaxRouter.put("/cart/checkout", async ctx => {
       landing_url: paths,
     }
     api.orders.update(orderID, data)
-
-    const printify = await printifyClient("shippingCost", json)
-
-    console.log(printify.data.data.shippingCost.standard)
 
     ctx.cookies.set("order_id")
     ctx.body = json
@@ -735,19 +727,7 @@ ajaxRouter.put("/cart", async ctx => {
 
     const cartResponse = await api.orders.update(orderID, cartData)
 
-    // TODO: shipping cost might be calculated somewhere else, added Printify here temporary to test intergration
-    const { json: data }: { status: number; json: Order } = await fillCartItems(
-      cartResponse
-    )
-
-    const printify = await printifyClient("shippingCost", data)
-
-    console.log(printify.data.data.shippingCost.standard)
-
-    const { status, json }: { status: number; json: Order } =
-      await fillCartItems(cartResponse)
-
-    json.shipping_price = printify.data.data.shippingCost.standard
+    const { status, json } = await fillCartItems(cartResponse)
 
     ctx.body = json
     ctx.status = status
@@ -887,7 +867,7 @@ ajaxRouter.get("/shipping_methods", async ctx => {
 
   const printify = await printifyClient("shippingCost", data)
 
-  console.log(printify.data.data.shippingCost.standard, "shippingCost.standard")
+  console.log(printify.data.data.shippingCost.standard, "dasfasfs")
 
   json.map(shippingMethods => {
     shippingMethods.price = printify.data.data.shippingCost.standard
@@ -921,3 +901,4 @@ ajaxRouter.get("/payment_form_settings", async ctx => {
 })
 
 export default ajaxRouter
+ 
