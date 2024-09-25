@@ -3,6 +3,7 @@ import FlatButton from "material-ui/FlatButton"
 import React, { FC, useEffect, useState } from "react"
 
 interface Props {
+  open
   title
   description
   submitLabel

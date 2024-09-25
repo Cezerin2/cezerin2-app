@@ -82,7 +82,7 @@ const CommerceForm: FC<Props> = props => {
       setIsServiceOptionsCalled(true)
       setIsTextField(isTextFieldValue)
     }
-  }, [props])
+  }, [initialValues, onLoad])
 
   const setTextField = index => {
     const value = index.indexOf(selectFieldValuesFirst[1]) !== -1 || false

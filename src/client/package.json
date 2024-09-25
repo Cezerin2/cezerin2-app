@@ -6,6 +6,17 @@
   "prodmain": "lib/main.js",
   "prodmodule": "lib/module.js",
   "prodtypes": "lib/types.d.ts",
+  "keywords": [
+    "cezerin",
+    "cezerin2",
+    "cezerin api",
+    "cezerin ajax",
+    "cezerin web store",
+    "ecommerce api",
+    "shopping cart api"
+  ],
+  "homepage": "https://chost.ansiglobal.com",
+  "bugs": "https://github.com/Cezerin2/Cezerin2/issues",
   "scripts": {
     "watch": "parcel watch",
     "build": "parcel build",
